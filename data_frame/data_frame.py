@@ -22,3 +22,23 @@ def executar(path: str) -> None:
     despachantes2.select("data").groupby(year("data")).count().show()
 
     despachantes2.select(sum("vendas")).show()
+
+
+def transformacao(path: str) -> None:
+    arqschema = "id INT, nome STRING, status STRING, cidade STRING, vendas INT, data STRING"
+    despachantes = spark.read.csv(f"{path}", header=False, schema=arqschema)
+
+    # Mostra todas as vendas de forma decrescente
+    despachantes.orderBy(col("vendas").desc()).show()
+
+    # Ordenação por duas colunas
+    despachantes.orderBy(col("cidade").desc(), col("vendas").desc()).show()
+
+    # Agrupando e somando as vendas
+    despachantes.groupby("cidade").agg(sum("vendas")).show()
+
+    # Ordenando pela soma das vendas de forma decrescente
+    despachantes.groupby("cidade").agg(sum("vendas")).orderBy(col("sum(vendas)").desc()).show()
+
+    # Filtrando um nome especifico
+    despachantes.filter(col("nome") == "Felisbela Dornelles").show()
